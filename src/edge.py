@@ -114,4 +114,5 @@ def run_searches():
 
 
 if __name__ == '__main__':
+    print("Starting process...")
     run_searches()
