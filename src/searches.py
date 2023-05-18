@@ -4,7 +4,7 @@ from src.helpers.generate_words import generate_words
 from src.helpers.kill_edge_process import kill_edge_processes
 
 
-def do_searches() -> None:
+def run_searches() -> None:
     kill_edge_processes()
     for i, profile in enumerate(PROFILES):
         print(

@@ -8,7 +8,7 @@ from tqdm.auto import tqdm
 
 from config import EDGE_EXE_PATH, EDGE_USER_DATA_PATH, BING_SEARCH_LINK, SLEEP_TIME
 from src.helpers.kill_edge_process import kill_edge_processes
-from src.searches import do_searches
+from src.searches import run_searches
 
 
 class SearchSession:
@@ -54,9 +54,8 @@ class SearchSession:
 
 if __name__ == "__main__":
     print("Starting process...")
-    # run_searches()
     try:
-        do_searches()
+        run_searches()
     except KeyboardInterrupt:
         print("\n\n ** Process interrupted by user. **\n")
         kill_edge_processes()
