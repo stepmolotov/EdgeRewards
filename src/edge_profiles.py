@@ -16,15 +16,15 @@ SLEEP_TIME = 2
 ##### ##### #####
 
 options = Options()
-options.add_experimental_option('excludeSwitches', ['enable-logging'])
+options.add_experimental_option("excludeSwitches", ["enable-logging"])
 options.binary_location = EDGE_EXE_PATH
 options.add_argument("user-data-dir=" + EDGE_USER_DATA_PATH)
-options.add_argument('--profile-directory=Profile 1')
-#options.add_argument("headless")
+options.add_argument("--profile-directory=Profile 1")
+# options.add_argument("headless")
 
 driver = webdriver.Edge(options=options)
 
 driver.get(BING_SEARCH_LINK + "hello")
 
-time.sleep(2*SLEEP_TIME)
+time.sleep(2 * SLEEP_TIME)
 driver.quit()

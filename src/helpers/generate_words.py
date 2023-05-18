@@ -10,7 +10,7 @@ def generate_words(n_words: int = 10, length: int = WORD_LENGTH) -> List[str]:
     words = []
     letters = string.ascii_lowercase
     for i in range(n_words):
-        random_word = ''.join(random.choice(letters) for _ in range(length))
+        random_word = "".join(random.choice(letters) for _ in range(length))
         words.append(random_word)
     # print('\t' + str(words))
     return words
