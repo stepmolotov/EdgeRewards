@@ -1,5 +1,5 @@
 from config import PROFILES, N_DESKTOP_SEARCHES, N_MOBILE_SEARCHES
-from src.edge import SearchSession
+from src.search.session import SearchSession
 from src.helpers.generate_words import generate_words
 from src.helpers.kill_edge_process import kill_edge_processes
 
