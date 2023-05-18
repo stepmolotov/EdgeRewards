@@ -7,23 +7,17 @@ from src.helpers.kill_edge_process import kill_edge_processes
 def run_searches() -> None:
     kill_edge_processes()
     for i, profile in enumerate(PROFILES):
-        print(
-            "\n* Profile: "
-            + profile
-            + " ["
-            + str(i + 1)
-            + "/"
-            + str(len(PROFILES))
-            + "]"
-        )
+        print(f"\n* Profile: {profile} [{i + 1}/{len(PROFILES)}]")
         # Generating random words
         desktop_search_words = generate_words(n_words=N_DESKTOP_SEARCHES)
         mobile_search_words = generate_words(n_words=N_MOBILE_SEARCHES)
 
-        # Desktop Searches
-        desktop = SearchSession(profile=profile, is_mobile=False)
-        desktop.run(words=desktop_search_words)
+        # Get profile details
+        # details
 
-        # Mobile Searches
-        mobile = SearchSession(profile=profile, is_mobile=True)
-        mobile.run(words=mobile_search_words)
+        # Desktop and Mobile searches
+        session = SearchSession(profile=profile)
+        details = session.get_details()
+        print(details)
+        session.run(words=desktop_search_words, is_mobile=False)
+        session.run(words=mobile_search_words, is_mobile=True)

@@ -4,6 +4,9 @@ from config import EDGE_KILL_COMMAND
 
 
 def kill_edge_processes() -> None:
+    """
+    Kill all Edge browser processes.
+    """
     try:
         os.system(EDGE_KILL_COMMAND)
         print(" ** Killed edge processes ** ")
