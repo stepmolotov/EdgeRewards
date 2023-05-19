@@ -109,7 +109,7 @@ class SearchSession:
             for word in pbar:
                 pbar.set_description(f"{prefix} Searched for: {word}")
                 self.__driver.get(BING_SEARCH_LINK + word)
-                time.sleep(SLEEP_TIME)
+                time.sleep(2 * SLEEP_TIME)
                 pbar.update()
 
         time.sleep(2 * SLEEP_TIME)
