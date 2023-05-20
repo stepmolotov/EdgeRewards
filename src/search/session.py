@@ -18,8 +18,9 @@ from src.search.homepage_data import HomepageData
 
 
 class SearchSession:
-    def __init__(self, profile: str) -> None:
+    def __init__(self, profile: str, headless: bool) -> None:
         self.__profile = profile
+        self.__headless = headless
         self.__options = self.__options_setup()
         self.__driver = webdriver.Edge(options=self.__options)
 
@@ -29,7 +30,8 @@ class SearchSession:
         options.binary_location = EDGE_EXE_PATH
         options.add_argument("user-data-dir=" + EDGE_USER_DATA_PATH)
         options.add_argument("--profile-directory=" + self.__profile)
-        # options.add_argument("headless")
+        if self.__headless:
+            options.add_argument("headless")
         # options.add_argument('--remote-debugging-port=' + str(PORT))
         return options
 

@@ -16,7 +16,7 @@ def run_searches() -> None:
         # details
 
         # Desktop and Mobile searches
-        session = SearchSession(profile=profile)
+        session = SearchSession(profile=profile, headless=True)
         details = session.get_details()
         print(details)
         session.run(words=desktop_search_words, is_mobile=False)
