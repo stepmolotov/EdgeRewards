@@ -8,6 +8,7 @@ EDGE_USER_DATA_PATH = (
     "C:\\Users\\" + USERNAME + "\\AppData\\Local\\Microsoft\\Edge\\User Data"
 )
 BING_SEARCH_LINK = "https://www.bing.com/search?q="
+REWARDS_HOMEPAGE = "https://rewards.bing.com/"
 
 N_DESKTOP_SEARCHES = 34
 N_MOBILE_SEARCHES = 20
