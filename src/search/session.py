@@ -40,6 +40,7 @@ class SearchSession:
             "(KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19",
         }
         self.__options.add_experimental_option("mobileEmulation", mobile_emulation)
+        self.__driver = webdriver.Edge(options=self.__options)
 
     @staticmethod
     def __get_homepage_data(page_source: str) -> HomepageData:
