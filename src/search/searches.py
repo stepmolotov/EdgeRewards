@@ -12,8 +12,6 @@ def run_searches() -> None:
         desktop_search_words = generate_words(n_words=N_DESKTOP_SEARCHES)
         mobile_search_words = generate_words(n_words=N_MOBILE_SEARCHES)
 
-        # Get profile details
-        # details
 
         # Desktop and Mobile searches
         session = SearchSession(profile=profile, headless=True)
