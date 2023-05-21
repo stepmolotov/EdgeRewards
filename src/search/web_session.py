@@ -22,10 +22,10 @@ class WebSession:
     ) -> None:
         self.__profile = profile
         self.__headless = headless
-        self.__crawler = CrawlerService()
-        self.__search = SearchService(profile=profile)
         self.__options = self.__options_setup()
         self.__driver = webdriver.Edge(options=self.__options)
+        self.__crawler = CrawlerService(driver=self.__driver)
+        self.__search = SearchService(profile=profile)
 
     def __options_setup(self) -> Options:
         options = Options()
@@ -55,4 +55,11 @@ class WebSession:
         self.__driver.quit()
 
     def get_details(self) -> HomepageData:
-        return self.__crawler.get_details(driver=self.__driver)
+        return self.__crawler.get_details()
+
+    def get_available_cards(self) -> None:
+        self.__crawler.get_available_cards()
+        self.__driver.quit()
+
+    def quit(self) -> None:
+        self.__driver.quit()

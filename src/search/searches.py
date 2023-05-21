@@ -13,9 +13,14 @@ def run_searches() -> None:
         mobile_search_words = generate_words(n_words=N_MOBILE_SEARCHES)
 
         # Desktop and Mobile searches
-        session = WebSession(profile=profile, headless=True)
+        session = WebSession(profile=profile, headless=False)
         # session = Injector().get(WebSession)
         details = session.get_details()
         print(details)
-        session.search(words=desktop_search_words, is_mobile=False)
-        session.search(words=mobile_search_words, is_mobile=True)
+
+        # wip clicks and stuff
+        session.get_available_cards()
+        session.quit()
+
+        # session.search(words=desktop_search_words, is_mobile=False)
+        # session.search(words=mobile_search_words, is_mobile=True)

@@ -9,22 +9,31 @@ from src.search.homepage_data import HomepageData
 
 
 class CrawlerService:
-    def __init__(self) -> None:
+    def __init__(self, driver: WebDriver) -> None:
         # TODO fill with info
         self.__max_retries = 3
+        self.__driver = driver
+        self.__homepage_soup = self.__get_homepage_soup(download_page=False)
 
-    @staticmethod
-    def __get_homepage_data(page_source: str) -> HomepageData:
+    def __get_homepage_soup(self, download_page: bool = False) -> BeautifulSoup:
+        self.__driver.get(REWARDS_HOMEPAGE)
+        time.sleep(3 * SLEEP_TIME)
+        page_source = self.__driver.page_source
+        if download_page:
+            self.__download_page_source()
+        soup = BeautifulSoup(page_source, "html5lib")
+        return soup
+
+    def __get_homepage_data(self) -> HomepageData:
         """
         Get the points from the homepage.
         :param page_source: The page source of the Microsoft Rewards homepage.
         :return: HomepageData with the username, the total points, the daily points and the streak.
         """
-        soup = BeautifulSoup(page_source, "html5lib")
 
         # get the banner items: [Name, Points, --Donations--, Daily, Streak]
         data = HomepageData()
-        banner_items = soup.find_all(
+        banner_items = self.__homepage_soup.find_all(
             "mee-rewards-user-status-banner-item", class_="ng-isolate-scope"
         )
         if len(banner_items) == 5:
@@ -51,16 +60,27 @@ class CrawlerService:
             print("Error while getting soup elements")
         return data
 
-    def get_details(self, driver: WebDriver) -> HomepageData:
+    def __download_page_source(self) -> None:
+        with open("page_source.html", "w", encoding="utf-8") as f:
+            f.write(self.__driver.page_source)
+
+    def get_available_cards(self) -> None:
+        cards_items = self.__homepage_soup.find_all(
+            "mee-rewards-daily-set-item-content", class_="ng-isolate-scope"
+        )
+        print(f"Found {len(cards_items)} cards")
+        for card in cards_items:
+            description = card.find("h3", class_="c-heading ellipsis ng-binding")
+            if description:
+                print(description.get_text())
+
+    def get_details(self) -> HomepageData:
         tries = 1
         homepage_data = HomepageData()
 
         while tries <= 3:
             try:
-                driver.get(REWARDS_HOMEPAGE)
-                time.sleep(3 * SLEEP_TIME)
-                page_source = driver.page_source
-                homepage_data = self.__get_homepage_data(page_source)
+                homepage_data = self.__get_homepage_data()
                 return homepage_data
             except Exception:
                 print(
