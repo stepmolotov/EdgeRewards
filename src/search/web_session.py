@@ -1,6 +1,5 @@
 from typing import List
 
-from injector import inject
 from selenium import webdriver
 from selenium.webdriver.edge.options import Options
 
@@ -13,19 +12,18 @@ from src.services.crawler_service import CrawlerService
 from src.services.search_service import SearchService
 
 
-@inject
 class WebSession:
     def __init__(
-            self,
-            profile: str,
-            headless: bool,
-            crawler: CrawlerService,
-            search: SearchService
+        self,
+        profile: str,
+        headless: bool,
+        # crawler: CrawlerService,
+        # search: SearchService
     ) -> None:
         self.__profile = profile
         self.__headless = headless
-        self.__crawler = crawler
-        self.__search = search
+        self.__crawler = CrawlerService()
+        self.__search = SearchService(profile=profile)
         self.__options = self.__options_setup()
         self.__driver = webdriver.Edge(options=self.__options)
 
@@ -45,7 +43,7 @@ class WebSession:
         mobile_emulation = {
             "deviceMetrics": {"width": 375, "height": 812, "pixelRatio": 3.0},
             "userAgent": "Mozilla/5.0 (Linux; Android 4.2.1; en-us; Nexus 5 Build/JOP40D) AppleWebKit/535.19 "
-                         "(KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19",
+            "(KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19",
         }
         self.__options.add_experimental_option("mobileEmulation", mobile_emulation)
         self.__driver = webdriver.Edge(options=self.__options)

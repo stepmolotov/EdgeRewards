@@ -1,7 +1,6 @@
 import time
 
 from bs4 import BeautifulSoup
-from injector import inject
 from selenium.webdriver.edge.webdriver import WebDriver
 
 from config import REWARDS_HOMEPAGE, SLEEP_TIME
@@ -9,9 +8,7 @@ from src.helpers.string_remove_space_newline import string_remove_space_newline
 from src.search.homepage_data import HomepageData
 
 
-@inject
 class CrawlerService:
-
     def __init__(self) -> None:
         # TODO fill with info
         self.__max_retries = 3
@@ -66,8 +63,9 @@ class CrawlerService:
                 homepage_data = self.__get_homepage_data(page_source)
                 return homepage_data
             except Exception:
-                print(f"[{tries}/{self.__max_retries}] Error while loading {REWARDS_HOMEPAGE}")
+                print(
+                    f"[{tries}/{self.__max_retries}] Error while loading {REWARDS_HOMEPAGE}"
+                )
                 tries += 1
                 time.sleep(3 * SLEEP_TIME)
         return homepage_data
-
