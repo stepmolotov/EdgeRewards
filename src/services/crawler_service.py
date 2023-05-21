@@ -14,7 +14,7 @@ class CrawlerService:
 
     def __init__(self) -> None:
         # TODO fill with info
-        pass
+        self.__max_retries = 3
 
     @staticmethod
     def __get_homepage_data(page_source: str) -> HomepageData:
@@ -56,18 +56,17 @@ class CrawlerService:
 
     def get_details(self, driver: WebDriver) -> HomepageData:
         tries = 1
-        max_tries = 3
         homepage_data = HomepageData()
 
         while tries <= 3:
             try:
                 driver.get(REWARDS_HOMEPAGE)
                 time.sleep(3 * SLEEP_TIME)
-                page_source = self.__driver.page_source
+                page_source = driver.page_source
                 homepage_data = self.__get_homepage_data(page_source)
                 return homepage_data
             except Exception:
-                print(f"[{tries}/{max_tries}] Error while loading {REWARDS_HOMEPAGE}")
+                print(f"[{tries}/{self.__max_retries}] Error while loading {REWARDS_HOMEPAGE}")
                 tries += 1
                 time.sleep(3 * SLEEP_TIME)
         return homepage_data
