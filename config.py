@@ -1,7 +1,7 @@
 ##### VARIABLES #####
 USERNAME = "Stepm"
-PROFILES = ["Default", "Profile 1", "Default2", "Profile 2", "Profile 3", "Profile 4"]
-# PROFILES = ['Personale', 'Personale 1', 'Personale 2']
+# PROFILES = ["Default", "Profile 1", "Default2", "Profile 2", "Profile 3", "Profile 4"]
+PROFILES = ["Profile 4"]
 
 EDGE_EXE_PATH = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
 EDGE_USER_DATA_PATH = (
@@ -17,7 +17,5 @@ SLEEP_TIME = 1
 
 PORT = 0
 
-# EDGE_KILL_COMMAND = "START /wait taskkill /f /im msedge.exe"
-# EDGE_KILL_COMMAND = "taskkill /f /im msedge.exe"
 EDGE_KILL_COMMAND = 'taskkill /f /im msedge.exe /t /fi "status eq running">nul'
 ##### ##### #####
