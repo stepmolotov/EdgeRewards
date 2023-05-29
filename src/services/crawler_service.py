@@ -1,27 +1,37 @@
+import json
 import time
+from typing import Any, List, Optional
 
 from bs4 import BeautifulSoup
+from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.webdriver import WebDriver
 
 from config import REWARDS_HOMEPAGE, SLEEP_TIME
+from src.card import Card
+from src.card_type_enum import CardTypeEnumeration
 from src.helpers.string_remove_space_newline import string_remove_space_newline
 from src.search.homepage_data import HomepageData
+import itertools
 
 
 class CrawlerService:
     def __init__(self, driver: WebDriver) -> None:
-        # TODO fill with info
         self.__max_retries = 3
         self.__driver = driver
-        self.__homepage_soup = self.__get_homepage_soup(download_page=False)
+        self.__homepage_soup = self.__get_homepage_soup(download_page=True)
 
     def __get_homepage_soup(self, download_page: bool = False) -> BeautifulSoup:
-        self.__driver.get(REWARDS_HOMEPAGE)
-        time.sleep(3 * SLEEP_TIME)
-        page_source = self.__driver.page_source
-        if download_page:
-            self.__download_page_source()
-        soup = BeautifulSoup(page_source, "html5lib")
+        try:
+            time.sleep(2 * SLEEP_TIME)
+            self.__driver.get(REWARDS_HOMEPAGE)
+            time.sleep(3 * SLEEP_TIME)
+            page_source = self.__driver.page_source
+            if download_page:
+                self.__download_page_source()
+            soup = BeautifulSoup(page_source, "html5lib")
+        except Exception as e:
+            print(e)
+            soup = BeautifulSoup("", "html5lib")
         return soup
 
     def __get_homepage_data(self) -> HomepageData:
@@ -60,6 +70,31 @@ class CrawlerService:
             print("Error while getting soup elements")
         return data
 
+    @staticmethod
+    def xpath_soup(element: Any) -> str:
+        """
+        Generate xpath of soup element
+        :param element: bs4 text or node
+        :return: xpath as string
+        """
+        components = []
+        child = element if element.name else element.parent
+        for parent in child.parents:
+            """
+            @type parent: bs4.element.Tag
+            """
+            previous = itertools.islice(
+                parent.children, 0, parent.contents.index(child)
+            )
+            xpath_tag = child.name
+            xpath_index = sum(1 for i in previous if i.name == xpath_tag) + 1
+            components.append(
+                xpath_tag if xpath_index == 1 else "%s[%d]" % (xpath_tag, xpath_index)
+            )
+            child = parent
+        components.reverse()
+        return "/%s" % "/".join(components)
+
     def __download_page_source(self) -> None:
         with open("page_source.html", "w", encoding="utf-8") as f:
             f.write(self.__driver.page_source)
@@ -73,6 +108,75 @@ class CrawlerService:
             description = card.find("h3", class_="c-heading ellipsis ng-binding")
             if description:
                 print(description.get_text())
+
+    def get_detailed_cards(self) -> List[Card]:
+        cards: List[Card] = []
+        cards_items = self.__homepage_soup.find_all("div", class_="c-card-content")
+        print(f"cards_items: {len(cards_items)}")
+        for card_item in cards_items:
+            points = card_item.find("div", class_="points clearfix")
+            if not points:
+                continue
+            points_quantity = points.find(
+                "span", class_="c-heading pointsString ng-binding ng-scope"
+            )
+            if not points_quantity:
+                continue
+            points_quantity_val = string_remove_space_newline(
+                points.find(
+                    "span", class_="c-heading pointsString ng-binding ng-scope"
+                ).get_text()
+            )
+            already_collected = points.find(
+                "span", class_="mee-icon mee-icon-SkypeCircleCheck"
+            )
+            daily_description = card_item.find(
+                "h3", class_="c-heading ellipsis ng-binding"
+            )
+            general_description = card_item.find("h3", class_="c-heading ng-binding")
+            description = (
+                daily_description.get_text()
+                if daily_description
+                else general_description.get_text()
+            )
+            points_val = int(points_quantity_val)
+            is_daily = daily_description is not None
+            already_collected = already_collected is not None
+            card_type = (
+                CardTypeEnumeration.click
+                if points_val <= 10
+                else CardTypeEnumeration.quiz
+            )
+            card = Card(
+                description=description,
+                points=points_val,
+                is_daily=is_daily,
+                already_collected=already_collected,
+                type=card_type,
+                soup=points_quantity,
+            )
+            cards.append(card)
+        return cards
+
+    def print_cards(self, cards: List[Card]) -> None:
+        print(f"cards: {len(cards)}")
+        for card in cards:
+            print(card)
+
+    def elaborate_cards(self, cards: List[Card]) -> None:
+        print(f"cards: {len(cards)}")
+        for card in cards:
+            if (
+                card.type == CardTypeEnumeration.click
+                and card.is_daily
+                and not card.already_collected
+            ):
+                xpath = self.xpath_soup(card.soup)
+                print(xpath)
+                time.sleep(2)
+                self.__driver.find_element(by=By.XPATH, value=xpath).click()
+                time.sleep(2)
+                print(f"Clicked on: {card.description} [{card.points} points]")
 
     def get_details(self) -> HomepageData:
         tries = 1
@@ -89,3 +193,12 @@ class CrawlerService:
                 tries += 1
                 time.sleep(3 * SLEEP_TIME)
         return homepage_data
+
+    def find_all_cards(self) -> None:
+        all_cards = self.__driver.find_elements(By.CLASS_NAME, "rewards-card-container")
+        # print(all_cards)
+        for card in all_cards:
+            data_m = card.get_attribute("data-m")
+            if data_m:
+                print(data_m)
+                print(json.loads(data_m).keys())

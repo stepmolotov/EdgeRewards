@@ -1,4 +1,6 @@
-from config import PROFILES, N_DESKTOP_SEARCHES, N_MOBILE_SEARCHES
+import time
+
+from config import PROFILES, N_DESKTOP_SEARCHES, N_MOBILE_SEARCHES, SLEEP_TIME
 from src.search.web_session import WebSession
 from src.helpers.generate_words import generate_words
 from src.helpers.kill_edge_process import kill_edge_processes
@@ -19,7 +21,10 @@ def run_searches() -> None:
         print(details)
 
         # wip clicks and stuff
-        session.get_available_cards()
+        cards = session.get_available_cards()
+        session.print_cards(cards)
+        # session.find_all_cards()
+        time.sleep(10 * SLEEP_TIME)
         session.quit()
 
         # session.search(words=desktop_search_words, is_mobile=False)

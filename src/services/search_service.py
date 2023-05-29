@@ -9,7 +9,6 @@ from config import BING_SEARCH_LINK, SLEEP_TIME
 
 class SearchService:
     def __init__(self, profile: str) -> None:
-        # TODO fill with info
         self.__profile = profile
 
     def run(self, driver: WebDriver, words: List[str], is_mobile: bool = False) -> None:

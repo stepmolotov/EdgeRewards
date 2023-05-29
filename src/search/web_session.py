@@ -7,6 +7,7 @@ from config import (
     EDGE_EXE_PATH,
     EDGE_USER_DATA_PATH,
 )
+from src.card import Card
 from src.search.homepage_data import HomepageData
 from src.services.crawler_service import CrawlerService
 from src.services.search_service import SearchService
@@ -25,7 +26,7 @@ class WebSession:
         self.__options = self.__options_setup()
         self.__driver = webdriver.Edge(options=self.__options)
         self.__crawler = CrawlerService(driver=self.__driver)
-        self.__search = SearchService(profile=profile)
+        self.__search = SearchService(profile=self.__profile)
 
     def __options_setup(self) -> Options:
         options = Options()
@@ -57,9 +58,15 @@ class WebSession:
     def get_details(self) -> HomepageData:
         return self.__crawler.get_details()
 
-    def get_available_cards(self) -> None:
-        self.__crawler.get_available_cards()
-        self.__driver.quit()
+    def get_available_cards(self) -> List[Card]:
+        cards = self.__crawler.get_detailed_cards()
+        return cards
+
+    def find_all_cards(self) -> None:
+        self.__crawler.find_all_cards()
+
+    def print_cards(self, cards: List[Card]) -> None:
+        self.__crawler.print_cards(cards)
 
     def quit(self) -> None:
         self.__driver.quit()
