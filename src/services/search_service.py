@@ -1,12 +1,14 @@
 import time
 from typing import List
 
+from injector import inject
 from selenium.webdriver.edge.webdriver import WebDriver
 from tqdm import tqdm
 
 from config import BING_SEARCH_LINK, SLEEP_TIME
 
 
+@inject
 class SearchService:
     def __init__(self, profile: str) -> None:
         self.__profile = profile

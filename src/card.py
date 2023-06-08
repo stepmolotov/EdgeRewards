@@ -17,4 +17,5 @@ class Card:
             f"{'Daily' if self.is_daily else 'General'}: "
             f"[{self.type.value} - {self.points}] {self.description}"
             f" - {'Already Collected' if self.already_collected else 'Not Collected'}"
+            # f" -> {self.soup}"
         )

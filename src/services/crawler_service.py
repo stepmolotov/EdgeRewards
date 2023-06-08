@@ -1,8 +1,9 @@
 import json
 import time
-from typing import Any, List, Optional
+from typing import Any, List
 
 from bs4 import BeautifulSoup
+from injector import inject
 from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.webdriver import WebDriver
 
@@ -10,10 +11,12 @@ from config import REWARDS_HOMEPAGE, SLEEP_TIME
 from src.card import Card
 from src.card_type_enum import CardTypeEnumeration
 from src.helpers.string_remove_space_newline import string_remove_space_newline
+from src.helpers.xpath_finder import xpath_finder
 from src.search.homepage_data import HomepageData
 import itertools
 
 
+@inject
 class CrawlerService:
     def __init__(self, driver: WebDriver) -> None:
         self.__max_retries = 3
@@ -70,31 +73,6 @@ class CrawlerService:
             print("Error while getting soup elements")
         return data
 
-    @staticmethod
-    def xpath_soup(element: Any) -> str:
-        """
-        Generate xpath of soup element
-        :param element: bs4 text or node
-        :return: xpath as string
-        """
-        components = []
-        child = element if element.name else element.parent
-        for parent in child.parents:
-            """
-            @type parent: bs4.element.Tag
-            """
-            previous = itertools.islice(
-                parent.children, 0, parent.contents.index(child)
-            )
-            xpath_tag = child.name
-            xpath_index = sum(1 for i in previous if i.name == xpath_tag) + 1
-            components.append(
-                xpath_tag if xpath_index == 1 else "%s[%d]" % (xpath_tag, xpath_index)
-            )
-            child = parent
-        components.reverse()
-        return "/%s" % "/".join(components)
-
     def __download_page_source(self) -> None:
         with open("page_source.html", "w", encoding="utf-8") as f:
             f.write(self.__driver.page_source)
@@ -134,26 +112,29 @@ class CrawlerService:
                 "h3", class_="c-heading ellipsis ng-binding"
             )
             general_description = card_item.find("h3", class_="c-heading ng-binding")
-            description = (
-                daily_description.get_text()
+            description_item = (
+                daily_description
                 if daily_description
-                else general_description.get_text()
+                else general_description
             )
+            description = description_item.get_text()
             points_val = int(points_quantity_val)
             is_daily = daily_description is not None
             already_collected = already_collected is not None
-            card_type = (
-                CardTypeEnumeration.click
-                if points_val <= 10
-                else CardTypeEnumeration.quiz
-            )
+            if points_val <= 10:
+                if CardTypeEnumeration.poll.value in str(description).lower():
+                    card_type = CardTypeEnumeration.poll
+                else:
+                    card_type = CardTypeEnumeration.click
+            else:
+                card_type = CardTypeEnumeration.quiz
             card = Card(
                 description=description,
                 points=points_val,
                 is_daily=is_daily,
                 already_collected=already_collected,
                 type=card_type,
-                soup=points_quantity,
+                soup=description_item,
             )
             cards.append(card)
         return cards
@@ -167,15 +148,15 @@ class CrawlerService:
         print(f"cards: {len(cards)}")
         for card in cards:
             if (
-                card.type == CardTypeEnumeration.click
-                and card.is_daily
-                and not card.already_collected
+                    card.type == CardTypeEnumeration.click
+                    and card.is_daily
+                    and not card.already_collected
             ):
-                xpath = self.xpath_soup(card.soup)
+                xpath = xpath_finder(card.soup)
                 print(xpath)
-                time.sleep(2)
+                time.sleep(2 * SLEEP_TIME)
                 self.__driver.find_element(by=By.XPATH, value=xpath).click()
-                time.sleep(2)
+                time.sleep(2 * SLEEP_TIME)
                 print(f"Clicked on: {card.description} [{card.points} points]")
 
     def get_details(self) -> HomepageData:

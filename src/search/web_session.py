@@ -9,6 +9,7 @@ from config import (
 )
 from src.card import Card
 from src.search.homepage_data import HomepageData
+from src.services.card_dealer_service import CardDealerService
 from src.services.crawler_service import CrawlerService
 from src.services.search_service import SearchService
 
@@ -20,6 +21,7 @@ class WebSession:
         headless: bool,
         # crawler: CrawlerService,
         # search: SearchService
+        # card_dealer: CardDealverService,
     ) -> None:
         self.__profile = profile
         self.__headless = headless
@@ -27,6 +29,7 @@ class WebSession:
         self.__driver = webdriver.Edge(options=self.__options)
         self.__crawler = CrawlerService(driver=self.__driver)
         self.__search = SearchService(profile=self.__profile)
+        self.__card_dealer = CardDealerService(driver=self.__driver)
 
     def __options_setup(self) -> Options:
         options = Options()
@@ -62,8 +65,8 @@ class WebSession:
         cards = self.__crawler.get_detailed_cards()
         return cards
 
-    def find_all_cards(self) -> None:
-        self.__crawler.find_all_cards()
+    def collect_cards(self, cards: List[Card]) -> None:
+        self.__card_dealer.run(cards)
 
     def print_cards(self, cards: List[Card]) -> None:
         self.__crawler.print_cards(cards)
