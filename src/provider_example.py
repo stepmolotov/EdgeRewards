@@ -1,7 +1,7 @@
 from injector import Injector, inject, provider
 
 class Database:
-    def __init__(self, host, port):
+    def __init__(self, host, port) -> None
         self.host = host
         self.port = port
 
@@ -16,11 +16,11 @@ def provide_database() -> Database:
     return Database(host, port)
 
 @inject
-def use_user_repository(user_repository: UserRepository):
+def use_user_repository(user_repository: UserRepository) -> None
     print(user_repository.database.host)
     print(user_repository.database.port)
 
-def main():
+def main() -> None:
     injector = Injector()
     user_repository = injector.get(UserRepository)
     use_user_repository(user_repository)
