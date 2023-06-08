@@ -1,7 +1,7 @@
 from injector import Injector, inject, provider
 
 class Database:
-    def __init__(self, host, port) -> None
+    def __init__(self, host, port) -> None:
         self.host = host
         self.port = port
 
