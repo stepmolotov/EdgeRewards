@@ -113,9 +113,7 @@ class CrawlerService:
             )
             general_description = card_item.find("h3", class_="c-heading ng-binding")
             description_item = (
-                daily_description
-                if daily_description
-                else general_description
+                daily_description if daily_description else general_description
             )
             description = description_item.get_text()
             points_val = int(points_quantity_val)
@@ -148,9 +146,9 @@ class CrawlerService:
         print(f"cards: {len(cards)}")
         for card in cards:
             if (
-                    card.type == CardTypeEnumeration.click
-                    and card.is_daily
-                    and not card.already_collected
+                card.type == CardTypeEnumeration.click
+                and card.is_daily
+                and not card.already_collected
             ):
                 xpath = xpath_finder(card.soup)
                 print(xpath)

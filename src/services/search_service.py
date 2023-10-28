@@ -32,4 +32,4 @@ class SearchService:
     @staticmethod
     def random_sleep() -> None:
         random_value = random.uniform(1.0, 5.0)
-        time.sleep(random_value*SLEEP_TIME)
+        time.sleep(random_value * SLEEP_TIME)

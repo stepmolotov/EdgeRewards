@@ -2,7 +2,13 @@ import time
 
 from injector import Injector
 
-from config import PROFILES, N_DESKTOP_SEARCHES, N_MOBILE_SEARCHES, SLEEP_TIME, WORD_LIST_PATH
+from config import (
+    PROFILES,
+    N_DESKTOP_SEARCHES,
+    N_MOBILE_SEARCHES,
+    SLEEP_TIME,
+    WORD_LIST_PATH,
+)
 from src.search.web_session import WebSession
 from src.helpers.generate_words import generate_words
 from src.helpers.kill_edge_process import kill_edge_processes
@@ -13,8 +19,12 @@ def run_searches() -> None:
     for i, profile in enumerate(PROFILES):
         print(f"\n* Profile: {profile} [{i + 1}/{len(PROFILES)}]")
         # Generating random words
-        desktop_search_words = generate_words(n_words=N_DESKTOP_SEARCHES, min_length=4, file_path=WORD_LIST_PATH)
-        mobile_search_words = generate_words(n_words=N_MOBILE_SEARCHES, min_length=4, file_path=WORD_LIST_PATH)
+        desktop_search_words = generate_words(
+            n_words=N_DESKTOP_SEARCHES, min_length=4, file_path=WORD_LIST_PATH
+        )
+        mobile_search_words = generate_words(
+            n_words=N_MOBILE_SEARCHES, min_length=4, file_path=WORD_LIST_PATH
+        )
 
         # Desktop and Mobile searches
         # injector = Injector()

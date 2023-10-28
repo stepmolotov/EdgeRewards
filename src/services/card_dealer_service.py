@@ -36,22 +36,21 @@ class CardDealerService:
         # always select first option
         self.__driver
 
-
     def __card_quiz(self, card: Card) -> None:
         pass
 
     def run(self, cards: List[Card]) -> None:
-        '''
+        """
         Run through the list of Cards and collect the points.
         :param cards:
         :return:
-        '''
+        """
         for card in cards:
             # if not card.is_daily:
             #     continue
             print(card)
             if card.type == CardTypeEnumeration.click:
-                print('CLICK!')
+                print("CLICK!")
                 self.__card_click(card)
             elif card.type == CardTypeEnumeration.poll:
                 self.__card_poll(card)
