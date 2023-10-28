@@ -10,6 +10,8 @@ EDGE_USER_DATA_PATH = (
 BING_SEARCH_LINK = "https://www.bing.com/search?q="
 REWARDS_HOMEPAGE = "https://rewards.bing.com/"
 
+WORD_LIST_PATH = "resources/1000_parole_italiane_comuni.txt"
+
 N_DESKTOP_SEARCHES = 34
 N_MOBILE_SEARCHES = 20
 WORD_LENGTH = 6

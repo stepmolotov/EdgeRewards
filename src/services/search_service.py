@@ -1,3 +1,4 @@
+import random
 import time
 from typing import List
 
@@ -23,7 +24,12 @@ class SearchService:
             for word in pbar:
                 pbar.set_description(f"{prefix} Searched for: {word}")
                 driver.get(BING_SEARCH_LINK + word)
-                time.sleep(2 * SLEEP_TIME)
+                self.random_sleep()
                 pbar.update()
 
-        time.sleep(2 * SLEEP_TIME)
+        self.random_sleep()
+
+    @staticmethod
+    def random_sleep() -> None:
+        random_value = random.uniform(1.0, 5.0)
+        time.sleep(random_value*SLEEP_TIME)
