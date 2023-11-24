@@ -6,7 +6,7 @@ from injector import inject
 from selenium.webdriver.edge.webdriver import WebDriver
 from tqdm import tqdm
 
-from config import BING_SEARCH_LINK, SLEEP_TIME
+from config import BING_SEARCH_LINK, SLEEP_TIME, BING_UPDATED_SEARCH_LINK, QUERY_PLACEHOLDER
 
 
 @inject
@@ -23,11 +23,15 @@ class SearchService:
         with tqdm(words, total=len(words), position=0, leave=True) as pbar:
             for word in pbar:
                 pbar.set_description(f"{prefix} Searched for: {word}")
-                driver.get(BING_SEARCH_LINK + word)
+                driver.get(self.__get_search_url(query=word))
                 self.random_sleep()
                 pbar.update()
 
         self.random_sleep()
+
+    def __get_search_url(self, query: str) -> str:
+        # return BING_SEARCH_LINK + query
+        return BING_UPDATED_SEARCH_LINK.replace(QUERY_PLACEHOLDER, query)
 
     @staticmethod
     def random_sleep() -> None:
