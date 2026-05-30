@@ -1,5 +1,6 @@
 import random
 import time
+from datetime import datetime
 from typing import List
 
 from injector import inject
@@ -20,11 +21,18 @@ class SearchService:
             if is_mobile
             else f"[{self.__profile} - Desktop]"
         )
+        counter = 0
         with tqdm(words, total=len(words), position=0, leave=True) as pbar:
             for word in pbar:
                 pbar.set_description(f"{prefix} Searched for: {word}")
                 driver.get(self.__get_search_url(query=word))
-                self.random_sleep()
+                counter += 1
+                if counter % 4 == 0:
+                    time = datetime.now().strftime("%H:%M:%S")
+                    print(f"[WAIT {time}] Long sleep for 15-17 minutes.")
+                    self.long_sleep()
+                else:
+                    self.random_sleep()
                 pbar.update()
 
         self.random_sleep()
@@ -36,4 +44,9 @@ class SearchService:
     @staticmethod
     def random_sleep() -> None:
         random_value = random.uniform(1.0, 5.0)
+        time.sleep(random_value * SLEEP_TIME)
+
+    @staticmethod
+    def long_sleep() -> None:
+        random_value = random.uniform(15*60, 17*60)
         time.sleep(random_value * SLEEP_TIME)
