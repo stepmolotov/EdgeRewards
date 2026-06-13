@@ -2,6 +2,7 @@
 collect_points.py
 -----------------
 Visits Microsoft Rewards, collects all available daily click-type cards,
+runs a random number of desktop Bing searches via the rewards textbox,
 and reports the total points before and after the run.
 
 Usage:
@@ -28,6 +29,7 @@ from config import (
     EDGE_EXE_PATH,
     EDGE_EXTRA_ARGS,
     EDGE_USER_DATA_PATH,
+    ENABLE_DESKTOP_SEARCHES,
     PROFILES,
     REWARDS_HOMEPAGE,
 )
@@ -35,7 +37,10 @@ from src.card import Card
 from src.card_type_enum import CardTypeEnumeration
 from src.helpers.kill_edge_process import kill_edge_processes
 from src.helpers.string_remove_space_newline import string_remove_space_newline
+from src.search.dashboard_data import parse_search_progress
 from src.search.homepage_data import HomepageData
+from src.search.query_generator import generate_search_queries
+from src.search.rewards_searcher import run_desktop_searches
 
 # ---------------------------------------------------------------------------
 # Human-like timing helpers
@@ -619,13 +624,13 @@ def run() -> None:
             _patch_webdriver_flag(driver)
 
             # ── Step 1 · Read current points ────────────────────────────
-            print("\n  [1/4] Loading rewards page…")
+            print("\n  [1/5] Loading rewards page…")
             soup_before = _fetch_soup(driver, save_debug=True)
             before = _parse_points(soup_before)
             print(f"        BEFORE  →  {before}")
 
             # ── Step 2 · Scan cards ──────────────────────────────────────
-            print("\n  [2/4] Scanning available cards…")
+            print("\n  [2/5] Scanning available cards…")
             cards = _parse_cards(soup_before)
             if not cards:
                 print("        No cards found. Saving page source for inspection…")
@@ -638,12 +643,24 @@ def run() -> None:
                     print(f"          [{status:10}] [{kind:8}] {card.description} ({card.points} pts)")
 
             # ── Step 3 · Collect click-type cards ────────────────────────
-            print("\n  [3/4] Collecting cards…")
+            print("\n  [3/5] Collecting cards…")
             collected = _collect_cards(driver, cards)
             print(f"\n        Clicked {collected} card(s).")
 
-            # ── Step 4 · Read updated points ─────────────────────────────
-            print("\n  [4/4] Refreshing page to confirm points…")
+            # ── Step 4 · Desktop searches via rewards textbox ────────────
+            searches_done = 0
+            if ENABLE_DESKTOP_SEARCHES:
+                queries = generate_search_queries()
+                print(f"\n  [4/5] Running {len(queries)} desktop search(es)…")
+                for q in queries:
+                    print(f"          · {q}")
+                searches_done = run_desktop_searches(driver, queries)
+                print(f"\n        Completed {searches_done} search(es).")
+            else:
+                print("\n  [4/5] Desktop searches disabled — skipping.")
+
+            # ── Step 5 · Read updated points ─────────────────────────────
+            print("\n  [5/5] Refreshing page to confirm points…")
             soup_after = _fetch_soup(driver)
             after = _parse_points(soup_after)
             print(f"        AFTER   →  {after}")
@@ -664,6 +681,11 @@ def run() -> None:
                 print(f"  Streak         :  {after.streak} day(s)")
             if after.daily is not None:
                 print(f"  Daily progress :  {after.daily} pt(s) earned today")
+            search_progress = parse_search_progress(driver.page_source)
+            if search_progress is not None:
+                print(f"  Search progress:  {search_progress}")
+            print(f"  Cards clicked  :  {collected}")
+            print(f"  Searches done  :  {searches_done}")
             print(f"  {'─' * 56}")
 
         except Exception as exc:

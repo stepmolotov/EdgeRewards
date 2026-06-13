@@ -51,10 +51,30 @@ REWARDS_HOMEPAGE = "https://rewards.bing.com/"
 
 WORD_LIST_PATH = "resources/1000_parole_italiane_comuni.txt"
 
+# Legacy search runner (src/edge.py) — collect_points.py uses SEARCH_COUNT_* instead.
 N_DESKTOP_SEARCHES = 12  # 34
 N_MOBILE_SEARCHES = 6  # 22
 WORD_LENGTH = 6
 SLEEP_TIME = 2
+
+# Rewards dashboard search (desktop only, via textbox on rewards.bing.com)
+ENABLE_DESKTOP_SEARCHES = (
+    os.environ.get("ENABLE_DESKTOP_SEARCHES", "true").lower() == "true"
+)
+SEARCH_COUNT_MIN = int(os.environ.get("SEARCH_COUNT_MIN", "4"))
+SEARCH_COUNT_MAX = int(os.environ.get("SEARCH_COUNT_MAX", "12"))
+SEARCH_QUERY_MIN_LENGTH = int(os.environ.get("SEARCH_QUERY_MIN_LENGTH", "4"))
+SEARCH_USE_PHRASES = os.environ.get("SEARCH_USE_PHRASES", "true").lower() == "true"
+SEARCH_PHRASE_CHANCE = float(os.environ.get("SEARCH_PHRASE_CHANCE", "0.3"))
+
+# Human-like delays between searches (seconds)
+SEARCH_BETWEEN_MIN = float(os.environ.get("SEARCH_BETWEEN_MIN", "8"))
+SEARCH_BETWEEN_MAX = float(os.environ.get("SEARCH_BETWEEN_MAX", "18"))
+SEARCH_RESULTS_READ_MIN = float(os.environ.get("SEARCH_RESULTS_READ_MIN", "4"))
+SEARCH_RESULTS_READ_MAX = float(os.environ.get("SEARCH_RESULTS_READ_MAX", "10"))
+SEARCH_LONG_PAUSE_EVERY = int(os.environ.get("SEARCH_LONG_PAUSE_EVERY", "4"))
+SEARCH_LONG_PAUSE_MIN = float(os.environ.get("SEARCH_LONG_PAUSE_MIN", "45"))
+SEARCH_LONG_PAUSE_MAX = float(os.environ.get("SEARCH_LONG_PAUSE_MAX", "90"))
 
 PORT = 0
 ##### ##### #####
