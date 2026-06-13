@@ -198,7 +198,7 @@ def _parse_daily_set_cards(soup: BeautifulSoup) -> list[Card]:
     cards. The key markers are:
       - Element: mee-rewards-daily-set-item-content
       - tabindex="0"  on the inner div → today's card  (tabindex="-1" → tomorrow's, skip)
-      - aria-disabled on a.ds-card-sec: "false" = available, "true" = already collected
+      - aria-disabled on a.ds-card-sec: empty or "false" = available, "true" = collected
       - Points: span.pointsString inside the card
       - Clickable element: the a.ds-card-sec link itself
     """
@@ -393,9 +393,19 @@ def _go_home(driver: webdriver.Edge) -> None:
 # green check icon (``span.mee-icon-SkypeCircleCheck``) — ``aria-disabled``
 # stays "false" even after completion, so we cannot rely on it.
 
+_DAILY_SET_LINK_SELECTOR = (
+    "mee-rewards-daily-set-item-content "
+    ".rewards-card-container[tabindex='0'] a.ds-card-sec"
+)
+
 _OTHER_LINK_SELECTOR = (
     "mee-rewards-more-activities-card-item a.ds-card-sec"
 )
+
+
+def _daily_set_card_is_available(element) -> bool:
+    """Return True if the daily-set card can still be clicked for points."""
+    return element.get_attribute("aria-disabled") != "true"
 
 
 def _other_card_is_completed(element) -> bool:
@@ -458,6 +468,8 @@ def _collect_cards(driver: webdriver.Edge, cards: list[Card]) -> int:
             print(f"    ○  [Poll (skip)  ]  {card.description} ({card.points} pts)")
         elif card.type == CardTypeEnumeration.quiz:
             print(f"    ○  [Quiz (skip)  ]  {card.description} ({card.points} pts)")
+        elif card.type == CardTypeEnumeration.click:
+            print(f"    ○  [Click        ]  {card.description} ({card.points} pts)")
 
     clicked = 0
 
@@ -470,16 +482,19 @@ def _collect_cards(driver: webdriver.Edge, cards: list[Card]) -> int:
     while True:
         _short_pause()
         try:
-            available = driver.find_elements(
-                By.CSS_SELECTOR,
-                "mee-rewards-daily-set-item-content a.ds-card-sec[aria-disabled='false']",
+            candidates = driver.find_elements(
+                By.CSS_SELECTOR, _DAILY_SET_LINK_SELECTOR
             )
         except Exception:
             break
 
-        # Filter out cards we already clicked this session
-        available = [el for el in available
-                     if el.get_attribute("aria-label") not in seen_labels]
+        # Available cards use aria-disabled="" or "false"; collected use "true".
+        # tabindex="0" on the container excludes tomorrow's preview (tabindex="-1").
+        available = [
+            el for el in candidates
+            if _daily_set_card_is_available(el)
+            and el.get_attribute("aria-label") not in seen_labels
+        ]
         if not available:
             break
 
